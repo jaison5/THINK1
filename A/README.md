@@ -1,6 +1,6 @@
-# 方向 A：無前視、walk-forward 的量子序列模型基準
+# 無前視、walk-forward 的量子序列模型基準
 
-**暫定題目**：Leakage-Free Walk-Forward Benchmarking of Quantum Sequence Models for FX Forecasting
+**暫定**：Leakage-Free Walk-Forward Benchmarking of Quantum Sequence Models for FX Forecasting
 
 ## 結論
 
