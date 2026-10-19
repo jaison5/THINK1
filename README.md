@@ -61,10 +61,3 @@ cd A
 ```
 
 原論文的重現步驟見 `qfin-main/README.md`、`qfin-main/REPRODUCTION_WIN.md`；B 的步驟見 `B/README.md`。
-
-## 相關文件
-
-- [新論文的突破策略與投稿設計](https://claude.ai/code/artifact/cbcf5076-6d03-4d70-9ebd-d0170d1c2da1)
-- [兩篇論文的痛點與新論文方向](https://claude.ai/code/artifact/d17dcfc8-2d23-4782-a022-1cdd99179598)
-- [論文重現報告講稿](https://claude.ai/code/artifact/00809585-dfaf-4ce4-9f9e-5843fceddfcc)
-- 原論文：Batched Training for QLSTM vs. QFWP（[arXiv 2512.21820](https://arxiv.org/abs/2512.21820)）
