@@ -1,4 +1,4 @@
-# 論文一：Yahoo 匯率日線的前視洩漏，與無前視的量子序列模型基準
+# Yahoo 匯率日線的前視洩漏，與無前視的量子序列模型基準
 
 **暫定題目**：Look-Ahead Leakage and Simulator Artifacts in Quantum Time-Series Forecasting: An Audit and a Leak-Free Walk-Forward Benchmark
 
