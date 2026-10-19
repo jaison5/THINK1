@@ -5,9 +5,8 @@
 
 ## 結論：重疊判斷
 
-- **批次模擬器本身：高度重疊，不是新貢獻。** TorchQuantum（QuantumNAS，HPCA 2022）已經指出「PennyLane 用 for 迴圈處理批次，訓練速度隨批次大小線性下降」，並報告張量化批次比 PennyLane 快 246 到 10⁴ 倍。TensorCircuit 也支援向量化（vmap）與自動微分。adjoint 梯度方法則來自 Jones 與 Gacon 2020。
+- **批次模擬器本身：高度重疊，非新貢獻。** TorchQuantum（QuantumNAS，HPCA 2022）已經指出「PennyLane 用 for 迴圈處理批次，訓練速度隨批次大小線性下降」，並報告張量化批次比 PennyLane 快 246 到 10⁴ 倍。TensorCircuit 也支援向量化（vmap）與自動微分。adjoint 梯度方法則來自 Jones 與 Gacon 2020。
 - **我們的貢獻：低度重疊。** 我們用這個已知限制，更正論文一（2025）的系統結論「批次加速約 2 倍就到頂、反向是瓶頸」，並證明這個限制在 PennyLane 0.45 的 lightning.qubit 仍然存在。換成批次模擬後完整訓練快 6～61 倍，而且結果和 PennyLane 相同。另外用光錐分析指出 QLSTM 32 個參數中有 16 個、QFWP 33 個中有 8 個沒有作用，「參數量相同（EPC）」的比較並不公平。這兩點沒有找到前例。
-- **建議：** B 單獨投稿的新穎性不足，適合併入主論文一節，或寫成短篇 workshop 論文。
 
 ## 相關文獻與重疊程度
 
