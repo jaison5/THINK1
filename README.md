@@ -1,6 +1,6 @@
 # Yahoo 匯率日線的前視洩漏，與無前視的量子序列模型基準
 
-**暫定題目**：Look-Ahead Leakage and Simulator Artifacts in Quantum Time-Series Forecasting: An Audit and a Leak-Free Walk-Forward Benchmark
+**暫定**：Look-Ahead Leakage and Simulator Artifacts in Quantum Time-Series Forecasting: An Audit and a Leak-Free Walk-Forward Benchmark
 
 這個資料夾放論文一用到的所有程式、資料、結果和紀錄，由 `B:\qfin-main\sync_papers.py` 從原本的實驗資料夾複製過來。資料夾結構和原本相同（`qfin-main`、`A`、`B` 並排），程式不用改路徑就能直接執行。
 
