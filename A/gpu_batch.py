@@ -1,17 +1,3 @@
-"""方向 A 的 GPU 批次執行器：同一個設定（匯率、資料、fold、模型）的多個種子與學習率，疊成一個張量在 GPU 上一起訓練。
-
-為什麼：這些模型很小（3～8 qubits），一次只訓練一個時，GPU 和 CPU 的時間都花在固定開銷上。把 G 個模型的參數疊成
-(G, …) 的張量，一次前向／反向就同時更新 G 個模型，每個模型仍然：
-  - 用自己的種子初始化（先用 torch.manual_seed(seed) 建出和 wf.make_model 完全相同的模型，再把參數疊起來）
-  - 用自己的資料順序（np.random.default_rng(seed + 1000)，同 wf.train_eval）
-  - 用自己的 Adam 狀態與學習率（Adam 是逐元素的，疊起來計算和分開計算相同）
-  - 各自做 early stopping（停下的模型不再更新紀錄；結果和單獨訓練的流程相同）
-總損失 = 各模型損失相加，所以梯度互不影響。輸出的 JSON 格式和 run_a1.py／run_a2.py 相同，report_a.py 不用改。
-
-用法：python gpu_batch.py --procs 6      （開 6 個行程，各自認領設定；每個行程只用 1 個 CPU 執行緒。
-                                         QLSTM 疊起來放 GPU，其他模型疊起來放 CPU：實測在 CPU 忙碌時這樣最快）
-      python gpu_batch.py --check         （和 CPU 版 wf.train_eval 比對）
-"""
 from __future__ import annotations
 
 import argparse
@@ -35,11 +21,7 @@ LRS = [0.005, 0.02, 0.05]
 COST = {"QLSTM": 10, "QFWP": 3, "FWPC": 3, "LSTM3": 1, "LSTM1": 1}
 
 
-# ---------------------------------------------------------------- 疊起來的模型
-
-
 class Stacked:
-    """把 G 個同型模型的參數疊成 (G, …) 張量；forward(X) 吃 (G, B, L, 4)，回傳 (G, B)。"""
 
     def __init__(self, name, seeds, device):
         import torch
@@ -98,7 +80,6 @@ class Stacked:
                     out = torch.tanh((z * theta).sum(-1, keepdim=True))
                 y = lin(out, "post")
             return y[..., 0]
-        # LSTM（PyTorch 的閘門順序 i, f, g, o）
         Wih, Whh = P["lstm.weight_ih_l0"], P["lstm.weight_hh_l0"]
         bias = (P["lstm.bias_ih_l0"] + P["lstm.bias_hh_l0"])[:, None, :]
         H = Whh.shape[-1]
@@ -112,7 +93,6 @@ class Stacked:
 
 
 class StackedAdam:
-    """逐元素的 Adam，每個模型有自己的學習率（數學上和每個模型各用一個 torch.optim.Adam 相同）。"""
 
     def __init__(self, params, lrs, betas=(0.9, 0.999), eps=1e-8):
         import torch
@@ -136,11 +116,7 @@ class StackedAdam:
                 p.grad = None
 
 
-# ---------------------------------------------------------------- 訓練一組
-
-
 def train_group(d, tr, va, te, name, lrs, seeds, device, batch=16, max_epochs=10, patience=3, fixed_steps=None):
-    """回傳每個模型的結果 dict（同 wf.train_eval）。fixed_steps 給 A2 用：固定更新次數、不做 early stopping。"""
     import torch
     import wf
     G = len(seeds)
@@ -203,9 +179,6 @@ def train_group(d, tr, va, te, name, lrs, seeds, device, batch=16, max_epochs=10
              "pred_test": pt[g].tolist()} for g in range(G)], None
 
 
-# ---------------------------------------------------------------- 認領與排程
-
-
 def claim(key):
     LOCKS.mkdir(parents=True, exist_ok=True)
     try:
@@ -243,11 +216,11 @@ def run_a1_config(cfg, device, cache):
             p.write_text(json.dumps({**r, **meta, "lr": lr, "seed": s, "seconds": sec, "group_size": len(todo)}))
         print(f"{asset} {variant:7s} {year} {model:5s} {len(todo):2d} 個模型一起訓練，{time.time() - t0:.0f} 秒", flush=True)
 
-    go([(lr, s) for lr in LRS for s in range(5)])  # 階段 1
+    go([(lr, s) for lr in LRS for s in range(5)])
     val = {lr: np.mean([json.loads(a1_path(asset, variant, year, model, lr, s).read_text())["val_rmse"] for s in range(5)])
            for lr in LRS}
     best_lr = min(val, key=val.get)
-    go([(best_lr, s) for s in range(5, 20)])  # 階段 2（只看驗證集選出的學習率）
+    go([(best_lr, s) for s in range(5, 20)])
 
 
 def run_a2_group(g, device, cache):
@@ -291,10 +264,10 @@ def gpu_worker(wid, device):
         if not claim(key):
             continue
         model = j[3] if kind == "a1" else j[1]
-        dev = device if (model == "QLSTM" and torch.cuda.is_available()) else "cpu"  # 只有 QLSTM 在 GPU 上比較划算
+        dev = device if (model == "QLSTM" and torch.cuda.is_available()) else "cpu"
         try:
             (run_a1_config if kind == "a1" else run_a2_group)(j, dev, cache)
-        except Exception as e:  # 失敗時放掉鎖，讓之後可以重跑
+        except Exception as e:
             (LOCKS / f"{key}.lock").unlink(missing_ok=True)
             print(f"[{wid}] {key} 失敗：{e!r}", flush=True)
             raise
@@ -314,7 +287,6 @@ def write_lr_choice():
 
 
 def check(device):
-    """和 CPU 版 wf.train_eval 比對（2 個 epoch、2 個種子、兩種學習率）。"""
     import wf
     d = wf.load("EURUSD", "aligned")
     tr, va, te = wf.fold_idx(d, 2018)

@@ -1,16 +1,3 @@
-"""實驗一（PennyLane 版）：QLSTM vs QFWP，EUR/USD 日線 2003-12～2024-12、序列 5、80/20、2 epochs。
-資料處理和 numpy 版共用（exp1a.prep），結果格式也相同，可直接用 report1.py 彙整。
-
-用法：
-  python pl_exp1.py --seeds 10 --jobs 16 --lr 0.05 --opt adam
-  python report1.py pl_adam0.05
-參數：
-  --jobs     同時跑幾個訓練（每個只用 1 個 CPU 核心；9950X3D 建議 16）
-  --models   QLSTM,QFWP,LSTM
-  --batches  1,4,8,16,32,64（1 = non-batch）
-  --device   lightning.qubit（論文）或 default.qubit
-  --diff     adjoint（論文）或 best
-"""
 from __future__ import annotations
 
 import argparse
@@ -51,7 +38,7 @@ def run(job):
     rng = np.random.default_rng(seed + 1000)
     tf = tb = 0.0
     t0 = time.perf_counter()
-    for _ in range(2):  # 論文：2 epochs
+    for _ in range(2):
         idx = rng.permutation(n_tr)
         for s in range(0, n_tr, batch):
             j = torch.as_tensor(idx[s:s + batch])
@@ -103,7 +90,6 @@ if __name__ == "__main__":
           "rw_rmse": float(np.sqrt(np.mean((last[n_tr:] - tgt[n_tr:]) ** 2))),
           "rw_da_paper": da_paper(last[n_tr:], tgt[n_tr:]), **cfg}, d / "_data.json")
     print(f"訓練樣本 {n_tr}（論文 4374）、測試 {len(X) - n_tr}；結果存到 {d}", flush=True)
-    # QLSTM 最慢，排在最前面讓總時間最短
     jobs = [(m, int(b), s) for m in a.models.split(",") for s in range(a.seed0, a.seed0 + a.seeds)
             for b in a.batches.split(",")]
     ctx = mp.get_context("fork" if os.name != "nt" else "spawn")

@@ -1,5 +1,3 @@
-"""實驗一的訓練設定掃描：論文未說明最佳化器與學習率，找最接近論文 Table 2 的組合。
-用法：python3 sweep1.py [--jobs 2]；結果在 results/sweep1/。"""
 from __future__ import annotations
 import argparse, itertools, json
 from multiprocessing import Pool

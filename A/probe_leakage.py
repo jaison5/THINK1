@@ -1,17 +1,3 @@
-"""方向 A 的跨資產前視探針：Yahoo 日線的「當日高低價」是否洩漏隔天收盤的方向？不需要訓練任何模型。
-
-規則（零參數）：預測「明天收盤相對今天收盤」的方向 = sign(高低價中點 − 今天收盤)。
-  - 當天版：中點 = (今天 High + 今天 Low) / 2
-  - 前一天版：中點 = (昨天 High + 昨天 Low) / 2（沒有前視，當作對照）
-如果 K 棒的 Close 真的是收盤時的價格，當天的 High/Low 都發生在 Close 之前，兩個版本的準確率應該都接近 50%；
-如果 Close 其實是 K 棒開始時的價格（Yahoo 匯率日線的情況），當天的 High/Low 涵蓋了 Close 之後的走勢，當天版就會遠高於 50%。
-
-另外量 K 棒結構：|Close − Open| 的中位數 ÷ (High − Low) 的中位數。接近 0 代表 Close 幾乎等於 Open（Close 記在 K 棒開頭）。
-
-資產：Yahoo 匯率 22 個、股票／ETF 6 檔（交易所有明確收盤，應該沒有前視，當作對照）、加密貨幣 4 個（24 小時交易，以 UTC 切日）。
-期間：2003-12-01～2024-12-31（較晚上市的資產從有資料開始）。
-用法：python probe_leakage.py        （資料存到 data/probe/，結果存到 results/probe/）
-"""
 from __future__ import annotations
 
 import json
@@ -50,7 +36,7 @@ def clean(df, fx):
     df = df[["Open", "High", "Low", "Close"]].astype(float)
     df = df[(df > 0).all(axis=1)].dropna().sort_index().loc[START:END]
     removed = 0
-    if fx:  # 匯率的錯誤報價（和前後兩天平均差 25% 以上），同 qfin-main/exp2.load_data
+    if fx:
         for _ in range(10):
             lc = np.log(df)
             bad = ((lc - (lc.shift(1) + lc.shift(-1)) / 2).abs() > 0.25).any(axis=1)
@@ -63,7 +49,7 @@ def clean(df, fx):
 
 def probe(df):
     o, h, l, c = (df[k].to_numpy() for k in ("Open", "High", "Low", "Close"))
-    nxt = np.sign(c[2:] - c[1:-1])          # 明天收盤相對今天收盤（今天 = 第 1..n-2 天）
+    nxt = np.sign(c[2:] - c[1:-1])
     same = np.sign((h[1:-1] + l[1:-1]) / 2 - c[1:-1])
     prev = np.sign((h[:-2] + l[:-2]) / 2 - c[1:-1])
     m = (nxt != 0) & (same != 0) & (prev != 0)
@@ -100,7 +86,6 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     t.to_csv(OUT / "probe_leakage.csv", index=False, encoding="utf-8-sig")
     (OUT / "probe_leakage.json").write_text(json.dumps(rows, indent=1, ensure_ascii=False, default=float))
-    # ---- 摘要表
     lines = ["| 類別 | 代號 | 期間 | 天數 | 當天高低價規則 DA % | 前一天高低價規則 DA % | 差（百分點） | 中位數 \\|Close−Open\\| ÷ 高低價差 |",
              "|---|---|---|---|---|---|---|---|"]
     for _, r in t.iterrows():

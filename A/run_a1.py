@@ -1,15 +1,3 @@
-"""方向 A 實驗 A1：無前視、walk-forward 的量子序列模型基準。
-
-設定：3 個匯率 × 2 種資料（leaky 有前視／aligned 去前視）× 10 個 fold（測試年 2015～2024）× 5 個模型
-（QLSTM、QFWP、FWPC＝QFWP 換成古典函數的消融、LSTM1＝30 參數、LSTM3＝112 參數），batch 16。
-超參數只看驗證集：
-  階段 1：學習率 {0.005, 0.02, 0.05} 各跑種子 0～4，取驗證 RMSE 平均最低者（每個 fold、每個模型各自選）。
-  階段 2：選定的學習率再跑種子 5～19，合計 20 個種子。
-每次訓練最多 10 個 epoch，驗證 RMSE 連續 3 次沒進步就停，取驗證最好的那次去預測測試年。
-
-用法：python run_a1.py --jobs 8
-輸出：results/a1/<匯率>_<資料>/y<測試年>/<模型>_lr<lr>_s<種子>.json、results/a1/lr_choice.json
-"""
 from __future__ import annotations
 
 import argparse
@@ -21,7 +9,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 OUT = HERE / "results" / "a1"
-MODELS = ["QLSTM", "QFWP", "FWPC", "LSTM3", "LSTM1"]  # QLSTM 最慢，排最前面
+MODELS = ["QLSTM", "QFWP", "FWPC", "LSTM3", "LSTM1"]
 LRS = [0.005, 0.02, 0.05]
 VARIANTS = ["aligned", "leaky"]
 _CACHE = {}

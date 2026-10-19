@@ -1,14 +1,3 @@
-"""方向 A 實驗 A2：batch 大小的影響，是 batch 本身，還是「更新次數變少」？
-
-論文一固定 2 個 epoch，batch 越大更新次數越少（batch 4：2,188 次；batch 64：138 次），兩個因素混在一起。
-這裡在論文原本的 EUR/USD 單一 80/20 切分上比較兩種訓練預算：
-  epochs：固定 2 個 epoch（論文的做法）
-  steps ：固定 2,188 次更新（= batch 4 跑 2 個 epoch 的次數）
-模型 QLSTM、QFWP；batch 4／16／64；Adam lr 0.05；leaky 與 aligned 兩種資料；10 個種子。
-
-用法：python run_a2.py --jobs 8
-輸出：results/a2/<資料>/<模型>_b<batch>_<預算>_s<種子>.json
-"""
 from __future__ import annotations
 
 import argparse

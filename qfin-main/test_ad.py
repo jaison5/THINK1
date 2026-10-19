@@ -21,7 +21,6 @@ def fd_check(f, params, eps=1e-6):
         worst = max(worst, np.abs(g - num).max() / (np.abs(num).max() + 1e-12))
     return worst
 
-# 1) 電路：Ry + Rz + CNOT，|0> 與 |+> 起始
 for init in ("zero", "plus"):
     n = 4
     ops = []
@@ -36,15 +35,12 @@ for init in ("zero", "plus"):
     G = T(rng.normal(size=(5, 3)))
     print(init, "circuit grad rel err:", fd_check(lambda: sum_(C(P) * G), [P]))
 
-# 2) 已知結果：單一 qubit Ry(θ) 後 <Z> = cos θ
 C1 = Circuit(1, [("ry", 0, 0)], 1, [0])
 th = np.linspace(-3, 3, 7)
 print("Ry<Z>=cosθ max err:", np.abs(C1(T(th[:, None])).data[:, 0] - np.cos(th)).max())
-# Bell：H 由 |+> 起始；CNOT 後 <Z0>=0
 C2 = Circuit(2, [("ry", 0, 0), ("cnot", 0, 1)], 1, [0, 1])
 print("Ry(pi/2)+CNOT <Z0>,<Z1>:", C2(T([[np.pi / 2]])).data)
 
-# 3) 古典部分：小型 LSTM 式組合
 W = Param(rng.normal(size=(3, 4))); b = Param(rng.normal(size=4)); x = T(rng.normal(size=(6, 3)))
 w2 = Param(rng.normal(size=(4,)))
 def f():
@@ -54,7 +50,6 @@ def f():
     return sum_(square(h - 0.3)) + mean(ls[:, 0]) + sum_(tile_rows(w2, 6) * h) + sum_(reshape(h, (24,)) * 0.1)
 print("classical grad rel err:", fd_check(f, [W, b, w2]))
 
-# 4) 合併版電路和原始版逐值相同（含 Rz、CNOT 環）
 from ad import CircuitRef
 for init in ("zero", "plus"):
     n = 8; ops = []; k = 0

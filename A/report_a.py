@@ -1,5 +1,3 @@
-"""彙整方向 A 的結果 → results/summary_a.json、results/summary_a.md。
-用法：python report_a.py"""
 from __future__ import annotations
 
 import json
@@ -17,7 +15,7 @@ A1 = RES / "a1"
 MODELS = ["QLSTM", "QFWP", "FWPC", "LSTM1", "LSTM3"]
 NAMES = {"QLSTM": "QLSTM（32）", "QFWP": "QFWP（33）", "FWPC": "FWP 古典消融（33）", "LSTM1": "LSTM h=1（30）",
          "LSTM3": "LSTM h=3（112）", "Linear": "線性（21）", "Midpoint": "高低價中點（0）", "RW": "隨機漫步（0）"}
-COLLAPSE = 1.2  # 測試 RMSE 超過同一 fold 隨機漫步的 1.2 倍，視為訓練崩掉
+COLLAPSE = 1.2
 
 
 def md_table(df):

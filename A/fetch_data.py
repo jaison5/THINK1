@@ -1,5 +1,3 @@
-"""方向 A 的資料：Yahoo Finance 三個匯率日線（EUR/USD、GBP/USD、USD/JPY）。
-用法：python fetch_data.py   輸出到 A/data/ohlc_<代號>.csv"""
 from pathlib import Path
 
 import yfinance as yf

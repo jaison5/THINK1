@@ -1,11 +1,3 @@
-"""方向 B 實驗 B2：用 fastsim 重跑實驗一的完整訓練（2 epochs、Adam lr 0.05、batch non-batch／4／8／16／32／64、10 個種子），
-和 PennyLane 版（qfin-main/results_win/exp1a_pl_adam0.05）比較整體訓練時間與準確率。訓練流程和 pl_exp1.py 逐行對應。
-
-用法：
-  PennyLane 環境（先產生 results/grid_data.npz）：python train_grid.py --device cpu --jobs 16
-  GPU 環境：python train_grid.py --device cuda --seeds 3        （單一行程依序執行）
-輸出：results/grid_<device>/<模型>_b<batch>_s<seed>.json
-"""
 from __future__ import annotations
 
 import argparse

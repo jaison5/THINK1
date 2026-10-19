@@ -1,4 +1,3 @@
-"""彙整實驗一：對應論文 Table 2（準確率）、Table 3（時間）、Table 4（加速比）。"""
 from __future__ import annotations
 import json, sys
 import numpy as np
@@ -6,7 +5,7 @@ import pandas as pd
 from scipy.stats import wilcoxon
 from common import RES
 
-PAPER_T2 = {  # 論文 Table 2：batch → (RMSE QLSTM, RMSE QFWP, DA QLSTM, DA QFWP)
+PAPER_T2 = {
     4: (0.0034, 0.0030, 69.04, 72.72), 8: (0.0036, 0.0029, 67.89, 72.75), 16: (0.0039, 0.0029, 65.56, 72.34),
     32: (0.0043, 0.0031, 62.34, 70.18), 64: (0.0049, 0.0034, 58.67, 65.84)}
 PAPER_FULL_SPEEDUP = {"QLSTM": {4: 1.41, 8: 1.67, 16: 1.90, 32: 2.08, 64: 2.23},
@@ -71,7 +70,7 @@ def fmt(t):
 
 
 if __name__ == "__main__":
-    v = sys.argv[1] if len(sys.argv) > 1 else "paper"  # 例如 paper_adam0.05
+    v = sys.argv[1] if len(sys.argv) > 1 else "paper"
     o = tables(v)
     print(json.dumps(o["data"], indent=1))
     print(f"runs: {o['n_runs']}")

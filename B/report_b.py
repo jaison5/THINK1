@@ -1,5 +1,3 @@
-"""彙整方向 B 的結果 → results/summary_b.json、results/summary_b.md。
-用法（PennyLane 環境）：python report_b.py"""
 from __future__ import annotations
 
 import json
@@ -27,7 +25,6 @@ def md_table(df):
 
 def main():
     md, out = [], {}
-    # ---- B1：每一步的時間
     rows, execs = [], None
     for p in RES.glob("bench_step_*.json"):
         o = json.loads(p.read_text())
@@ -52,7 +49,6 @@ def main():
         for B in piv.columns:
             sp[f"B={B}"] = [f"{ref[B] / piv.loc[b, B]:.1f}×" for b in piv.index if b != "pl_adjoint"]
         md += [f"\n{model}：相對 PennyLane adjoint 的每筆加速倍數\n", md_table(sp)]
-    # ---- B2：完整訓練
     def load_dir(d, tag):
         return pd.DataFrame([{**json.loads(p.read_text()), "src": tag} for p in Path(d).glob("*_b*_s*.json")])
     pl = load_dir(PL_DIR, "PennyLane")
@@ -97,7 +93,6 @@ def main():
             "同種子 RMSE 相同（差<1e-8）的比例"]
     md += ["\n### B2：準確率（10 個種子）——換模擬器不改變結果\n",
            md_table(t[show].map(lambda x: f"{x:.2e}" if isinstance(x, float) and x < 0.01 else fmt(x)))]
-    # ---- 等價性檢查與零梯度參數
     chk = json.loads((RES / "check_fastsim.json").read_text())
     out["check"] = chk
     t = pd.DataFrame([{"模型": k, "參數量": v["n_params_pl"], "初始參數最大差": f"{v['max_abs_diff_init']:.1e}",

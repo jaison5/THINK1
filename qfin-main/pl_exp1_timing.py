@@ -1,14 +1,3 @@
-"""實驗一的補充計時：把 adjoint 梯度改在「反向」才計算（device_vjp=True），重量各部分時間，
-用來檢驗論文 Table 3、4 的「前向加速約 2.2～2.4 倍、反向只有約 1.0～1.2 倍」。
-訓練流程和 pl_exp1.py 相同（2 epochs、Adam lr 0.05），差別：
-  - device_vjp 可選（預設 True）；pl_exp1.py 用 PennyLane 預設，adjoint 時前向就把梯度算好
-    （lightning.qubit 會忽略 grad_on_execution=False，只有 device_vjp=True 才會把 adjoint 移到反向）。
-  - 推論用和訓練相同的 batch 大小（non-batch 為逐筆），對應論文「batched vs. non-batched」的 Infer-Forward。
-
-用法：
-  python pl_exp1_timing.py --seeds 3 --jobs 16
-  python pl_exp1_timing.py --summary
-"""
 from __future__ import annotations
 
 import argparse
