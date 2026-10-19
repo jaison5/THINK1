@@ -13,15 +13,15 @@
 
 | 文獻 | 做了什麼 | 和方向 B 的重疊 | 我們的差異 |
 |---|---|---|---|
-| [Wang 等人 2022，QuantumNAS／TorchQuantum（HPCA 2022）](https://arxiv.org/abs/2107.10845) | 原文：「PennyLane 用 'For' 迴圈處理批次，訓練速度隨批次大小線性下降」；TorchQuantum 張量化批次快 246 到 10⁴ 倍 | **高**：同樣的觀察與解法 | 他們比的是自己的 10-qubit 電路；我們指出這正是論文一系統結論的成因，並量化 QLSTM／QFWP 的實際影響 |
-| [Zhang 等人，TensorCircuit](https://arxiv.org/abs/2205.10091) | 以機器學習後端做張量網路模擬，支援自動微分、JIT 與向量化 | 高：批次化模擬的工具 | 可以當作額外的對照後端（見突破實驗 1） |
+| [Wang ... 2022，QuantumNAS／TorchQuantum（HPCA 2022）](https://arxiv.org/abs/2107.10845) | 原文：「PennyLane 用 'For' 迴圈處理批次，訓練速度隨批次大小線性下降」；TorchQuantum 張量化批次快 246 到 10⁴ 倍 | **高**：同樣的觀察與解法 | 他們比的是自己的 10-qubit 電路；我們指出這正是論文一系統結論的成因，並量化 QLSTM／QFWP 的實際影響 |
+| [Zhang ....，TensorCircuit](https://arxiv.org/abs/2205.10091) | 以機器學習後端做張量網路模擬，支援自動微分、JIT 與向量化 | 高：批次化模擬的工具 | 可以當作額外的對照後端（見突破實驗 1） |
 | [PennyLane 文件：broadcast_expand](https://docs.pennylane.ai/en/stable/code/api/pennylane.transforms.broadcast_expand.html) | 不支援 broadcasting 的裝置會把一個批次拆成多個 tape | 高：官方文件已說明機制 | 我們用 Tracker 實測：lightning.qubit 對 16 筆的批次執行 16 次電路，default.qubit 只做 1 次模擬 |
 | [PennyLane issue #4462](https://github.com/PennyLaneAI/pennylane/issues/4462) | 2023 年回報、至今仍未解決：gradient transform（例如 parameter-shift）無法對批次 QNode 求導；維護者建議用 broadcast_expand | 高：同一個限制 | 我們記錄它對 QLSTM／QFWP 的影響：parameter-shift 在批次輸入下完全無法使用 |
 | [Jones 與 Gacon 2020](https://arxiv.org/abs/2009.02823) | adjoint 梯度方法：O(P) 時間、O(1) 個 state vector | 中：論文一使用的微分方法 | 我們量出 adjoint 在 lightning.qubit 的實際時間分配（預設在前向就算梯度；改 device_vjp 反而更慢） |
-| [Lee 等人 2024，Light Cone Cancellation（2404.19497）](https://arxiv.org/abs/2404.19497) | 移除計算局部觀測量時用不到的閘 | 中：光錐概念 | 我們把光錐用在「參數是否有作用」，用來檢驗 EPC 是否公平 |
+| [Lee .... 2024，Light Cone Cancellation（2404.19497）](https://arxiv.org/abs/2404.19497) | 移除計算局部觀測量時用不到的閘 | 中：光錐概念 | 我們把光錐用在「參數是否有作用」，用來檢驗 EPC 是否公平 |
 | [Haug、Bharti、Kim 2021（PRX Quantum）](https://spiral.imperial.ac.uk/handle/10044/1/92426) | 用有效量子維度評估電路表達力，並移除冗餘參數而不影響有效維度 | 中：冗餘參數 | 我們發現的是更極端的情況：梯度恆為 0、完全沒有作用的參數 |
-| [Abbas 等人，The power of quantum neural networks（2011.00027）](https://arxiv.org/abs/2011.00027) | 以 Fisher 資訊定義有效維度 | 中：「有效參數量」的理論基礎 | 可用來定義比 EPC 更公平的比較標準（見突破實驗 2） |
-| [論文一（2512.21820）](https://arxiv.org/abs/2512.21820) | 被檢驗的系統結論：批次加速約 2 倍、反向是瓶頸 | — | — |
+| [Abbas ....，The power of quantum neural networks（2011.00027）](https://arxiv.org/abs/2011.00027) | 以 Fisher 資訊定義有效維度 | 中：「有效參數量」的理論基礎 | 可用來定義比 EPC 更公平的比較標準（見突破實驗 2） |
+| [Batched Training for QLSTM vs. QFWP（2512.21820）](https://arxiv.org/abs/2512.21820) | 被檢驗的系統結論：批次加速約 2 倍、反向是瓶頸 | — | — |
 
 ## 我們的差異
 
